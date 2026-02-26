@@ -1,0 +1,52 @@
+﻿    
+	EOPQuery = MsgBox("Would you like to turn visibility of all planes off? / Te gustaria apagar todos los planos?" _ 
+	& vbCrLf & "Click 'Yes' to turn on. / Clic 'yes' para encender" _ 
+	& vbCrLf & "Click 'No' to turn off. / Clic 'No' para apagar" _ 
+	, vbYesNo, "Sketch Visibility")
+	
+Dim comps As ObjectCollection
+Dim comp As Object
+comps = ThisApplication.TransientObjects.CreateObjectCollection
+While True
+    comp = ThisApplication.CommandManager.Pick(SelectionFilterEnum.kAssemblyOccurrenceFilter, "Select a component") 
+    If IsNothing(comp) Then Exit While
+    comps.Add(comp) 
+End While
+
+
+
+If EOPQuery = vbNo Then
+For Each comp In comps
+    Dim workPlanes As WorkPlanes
+    workPlanes = comp.Definition.WorkPlanes
+    If workPlanes.Count > 0 Then
+        For i = 1 To workPlanes.Count
+            If workPlanes.Item(i).Visible = True Then
+                workPlanes.Item(i).Visible = False
+            Else
+                workPlanes.Item(i).Visible = False
+            End If
+        Next
+    Else
+        MsgBox("Selected component does not have any workplanes.")
+    End If
+Next
+
+Else If EOPQuery = vbYes Then
+	For Each comp In comps
+    Dim workPlanes As WorkPlanes
+    workPlanes = comp.Definition.WorkPlanes
+    If workPlanes.Count > 0 Then
+        For i = 1 To workPlanes.Count
+            If workPlanes.Item(i).Visible = False Then
+                workPlanes.Item(i).Visible = True
+            Else
+                workPlanes.Item(i).Visible = True
+            End If
+        Next
+    Else
+        MsgBox("Selected component does not have any workplanes.")
+    End If
+Next
+End If
+ThisApplication.ActiveView.Update

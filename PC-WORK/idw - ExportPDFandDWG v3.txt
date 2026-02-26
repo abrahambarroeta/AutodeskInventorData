@@ -1,0 +1,52 @@
+﻿Imports System.Windows.Forms
+Imports Autodesk.iLogic.Interfaces
+Imports Inventor
+
+' Crear una lista para almacenar los nombres de archivos exportados
+Dim archivosExportados As New List(Of String)
+
+' Crear un objeto FolderBrowserDialog para seleccionar la carpeta una sola vez
+Dim folderBrowser As New FolderBrowserDialog()
+folderBrowser.Description = "Selecciona la carpeta para guardar los archivos"
+Dim folderPath As String = ""
+
+' Mostrar el cuadro de diálogo para seleccionar la carpeta
+If folderBrowser.ShowDialog() = DialogResult.OK Then
+    folderPath = folderBrowser.SelectedPath
+
+    ' Iterar a través de los documentos
+    Dim inventorApp As Inventor.Application = ThisApplication
+    For Each doc As Document In inventorApp.Documents
+        If doc.DocumentType = DocumentTypeEnum.kDrawingDocumentObject Then
+            ' Obtener el nombre del archivo de dibujo actual
+            Dim drawingName As String = doc.FullFileName
+            Dim drawingNameWithoutExtension As String = System.IO.Path.GetFileNameWithoutExtension(drawingName)
+
+            ' Definir los nombres de archivo para PDF y DWG utilizando el nombre del dibujo
+            Dim PDFPath As String = System.IO.Path.Combine(folderPath, drawingNameWithoutExtension & ".pdf")
+            Dim DWGPath As String = System.IO.Path.Combine(folderPath, drawingNameWithoutExtension & ".dwg")
+
+            ' Guardar los archivos en la carpeta seleccionada
+            doc.SaveAs(PDFPath, True)
+            doc.SaveAs(DWGPath, True)
+
+            ' Agregar los nombres de archivos exportados a la lista
+            archivosExportados.Add(PDFPath)
+            archivosExportados.Add(DWGPath)
+
+            ' Mostrar mensajes emergentes con el progreso
+            'MessageBox.Show("Archivos PDF y DWG del dibujo " & drawingNameWithoutExtension & " guardados con éxito en: " & folderPath, "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    Next
+
+    ' Mostrar un cuadro de diálogo al final con la lista de archivos exportados
+    If archivosExportados.Count > 0 Then
+        Dim archivosExportadosTexto As String = "Archivos exportados:" & vbCrLf
+
+        For Each archivo In archivosExportados
+            archivosExportadosTexto &= archivo & vbCrLf
+        Next
+
+        MessageBox.Show(archivosExportadosTexto, "Archivos Exportados", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    End If
+End If

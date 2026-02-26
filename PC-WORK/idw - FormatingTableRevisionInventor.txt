@@ -1,0 +1,37 @@
+﻿' Description: This script, change the revision table into a drawing (It's suppose that table deja exist) 
+'              accoding To the Alfyma's Standards
+' By Abraham Barroeta
+
+
+' ///////////////////////////////////////////////////////////
+' Declaration of Variables
+Dim oDrawingDoc As DrawingDocument
+Dim oSheet As Sheet
+Dim oRevTable As RevisionTable
+Dim nombre As String
+' ///////////////////////////////////////////////////////////
+
+oDrawingDoc = ThisApplication.ActiveDocument' Assigning value to Variable
+
+oRevTable = ThisDoc.Document.ActiveSheet.RevisionTables.Item(1) ' Assigning value to Variable
+
+' Checking if the columns "ZONE" exist
+nombre = oRevTable.RevisionTableColumns.Item(1).Title
+If nombre = "ZONE" Then ' Checking if the columns "ZONE" exist	
+	oRevTable.RevisionTableColumns.Item(1).Delete
+End If
+
+'Changing all the table data
+oRevTable.RevisionTableRows.Item(1).Item(4).Text = "MDF"
+oRevTable.RevisionTableRows.Item(1).Item(2).Text = "1ère Emission"
+
+
+
+
+' Changing the dimensions of columns (I don't know why but it works divided with 10)
+oRevTable.RevisionTableColumns.Item(1).Width = 10 / 10
+oRevTable.RevisionTableColumns.Item(2).Width = 120/10
+oRevTable.RevisionTableColumns.Item(3).Width = 35/10
+oRevTable.RevisionTableColumns.Item(4).Width = 25/10
+
+

@@ -1,0 +1,84 @@
+﻿Imports System
+AddReference "System.Drawing.dll"
+Imports System.Windows.Forms
+Imports Autodesk.iLogic.Interfaces
+
+Sub Main
+		Dim Form As New Form1
+
+		Form.ComboBox1.Items.Add("Test1")
+		Form.ComboBox1.Items.Add("Test2")
+		Form.ComboBox1.Items.Add("Test3")
+
+		Form.TopMost = True
+		Form.Show
+	End Sub
+
+	<Global .Microsoft.VisualBasic.CompilerServices.DesignerGenerated() > _
+	Public Class Form1
+		
+		Inherits System.Windows.Forms.Form
+		
+		'Trying to use sharedvariable
+		Dim oVariable As ISharedVariable
+		
+		<System.Diagnostics.DebuggerNonUserCode() > _
+		Protected Overrides Sub Dispose(ByVal Disposing As Boolean)
+			Try
+				If Disposing AndAlso components IsNot Nothing Then
+					components.Dispose()
+				End If
+			Finally
+				MyBase.Dispose(Disposing)
+			End Try
+		End Sub
+
+		Private components As System.ComponentModel.IContainer
+
+		<System.Diagnostics.DebuggerStepThrough() > _
+		Private Sub InitializeComponent()
+			Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+			Me.Button1 = New System.Windows.Forms.Button()
+			Me.SuspendLayout()
+			'
+			'ComboBox1
+			'
+			Me.ComboBox1.FormattingEnabled = True
+			Me.ComboBox1.Location = New System.Drawing.Point(12, 40)
+			Me.ComboBox1.Name = "ComboBox1"
+			Me.ComboBox1.Size = New System.Drawing.Size(182, 21)
+			Me.ComboBox1.TabIndex = 0
+			'
+			'Button1
+			'
+			Me.Button1.Location = New System.Drawing.Point(247, 40)
+			Me.Button1.Name = "Button1"
+			Me.Button1.Size = New System.Drawing.Size(75, 23)
+			Me.Button1.TabIndex = 1
+			Me.Button1.Text = "OK"
+			Me.Button1.UseVisualStyleBackColor = True
+			'
+			'Form1
+			'
+			Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+			Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+			Me.ClientSize = New System.Drawing.Size(377, 132)
+			Me.Controls.Add(Me.Button1)
+			Me.Controls.Add(Me.ComboBox1)
+			Me.Name = "Form1"
+			Me.Text = "NameOfForm"
+			Me.ResumeLayout(False)
+
+		End Sub
+
+		Friend WithEvents ComboBox1 As ComboBox
+		Friend WithEvents Button1 As Button
+
+		
+
+
+		Private Sub Button1_Click(sender As Object, E As EventArgs) Handles Button1.Click
+			oVariable("Selected") = ComboBox1.SelectedItem
+    	End Sub
+
+	End Class

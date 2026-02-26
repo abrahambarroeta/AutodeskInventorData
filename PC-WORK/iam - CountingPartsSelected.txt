@@ -1,0 +1,26 @@
+﻿Sub Main()
+	'Sub CountSelectedItems()
+	
+	Dim oDoc As Inventor.Document
+	oDoc = ThisApplication.ActiveEditDocument
+	
+	If oDoc Is Nothing Then
+	Exit Sub
+	End If
+	
+	If oDoc.DocumentType <> kAssemblyDocumentObject Then
+	Exit Sub
+	End If
+	
+	If oDoc.SelectSet.Count <> 0 Then
+	MsgBox ("Items selected: " & oDoc.SelectSet.Count)
+	Else
+	MsgBox("No items selected")
+	End If
+	
+	 'End Sub
+End Sub
+
+	
+	
+

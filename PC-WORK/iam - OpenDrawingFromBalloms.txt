@@ -1,0 +1,30 @@
+﻿Dim oDoc As DrawingDocument = ThisApplication.ActiveDocument
+
+While True
+
+	'select Balloon
+	Dim oBalloon As Balloon = Nothing
+	oBalloon = ThisApplication.CommandManager.Pick _
+	(SelectionFilterEnum.kDrawingBalloonFilter, _
+	"Select a balloon to open it's drawing. " & " (press ESC To Exit selection)")
+
+	If IsNothing(oBalloon) Then Exit While
+
+	Dim oLeader As Leader
+	If oBalloon IsNot Nothing Then oLeader = oBalloon.Leader
+	Dim oLeaderNode As LeaderNode = oLeader.AllNodes(oLeader.AllNodes.Count)
+	Dim oIntent As GeometryIntent = oLeaderNode.AttachedEntity
+	Dim oCurve As DrawingCurve = oIntent.Geometry
+	Dim oOcc As ComponentOccurrence = oCurve.ModelGeometry.ContainingOccurrence
+	Dim oRefDoc As Document = oOcc.Definition.Document
+	Dim oFilePath As String = oRefDoc.FullFileName()
+	Dim oDrawingFilePath As String = Left(oFilePath, Len(oFilePath) -3) & "idw"
+
+	Try
+		oDrawDoc = ThisApplication.Documents.Open(oDrawingFilePath, True)
+		Exit While
+	Catch
+		MsgBox("Could not open " & oDrawingFilePath, , "iLogic")
+	End Try
+
+End While

@@ -1,0 +1,78 @@
+﻿' Inicia el objeto Inventor Application
+Dim inventorApp As Inventor.Application
+inventorApp = ThisApplication
+
+' Muestra un cuadro de diálogo para seleccionar la carpeta de destino
+Dim folderDialog As New System.Windows.Forms.FolderBrowserDialog()
+folderDialog.Description = "Seleccione la carpeta de destino para los archivos .STEP"
+Dim resultado As System.Windows.Forms.DialogResult = folderDialog.ShowDialog()
+
+If resultado = System.Windows.Forms.DialogResult.OK Then
+    ' Obtiene la ruta de la carpeta seleccionada
+    Dim destino As String = folderDialog.SelectedPath
+
+    ' Muestra un cuadro de diálogo de selección de opciones
+    Dim seleccion As Integer = System.Windows.Forms.MessageBox.Show("¿Desea exportar solo el documento actual?", "Seleccione una opción", System.Windows.Forms.MessageBoxButtons.YesNoCancel, System.Windows.Forms.MessageBoxIcon.Question)
+
+    ' Recorre los documentos según la selección del usuario
+    Dim documentos As IEnumerable(Of Inventor.Document) = Nothing
+    If seleccion = System.Windows.Forms.DialogResult.Yes Then
+        ' Exportar solo el documento actual
+        Dim documentoActual As Inventor.Document = inventorApp.ActiveDocument
+		'MsgBox (documentoActual)
+        If documentoActual IsNot Nothing Then
+            documentos = New List(Of Inventor.Document) From {documentoActual}
+        End If
+    ElseIf seleccion = System.Windows.Forms.DialogResult.No Then
+        ' Exportar todos los documentos abiertos
+        documentos = inventorApp.Documents.VisibleDocuments.Cast(Of Inventor.Document)()
+    End If
+
+    If documentos IsNot Nothing Then
+        ' Recorre los documentos seleccionados
+        Dim totalDocumentos As Integer = documentos.Count()
+        Dim documentosExportados As Integer = 0
+
+        ' Crear una lista para almacenar los nombres de los archivos exportados
+        Dim archivosExportados As New List(Of String)
+
+        ' Actualiza la barra de estado con un mensaje inicial
+        inventorApp.StatusBarText = "Exportando documentos..."
+
+        For Each doc As Inventor.Document In documentos
+            ' Verifica si el documento es un modelo 3D (parte o ensamblaje)
+            If TypeOf doc Is Inventor.PartDocument Or TypeOf doc Is Inventor.AssemblyDocument Then
+                ' Extrae el nombre del archivo sin la extensión original
+                Dim nombreSinExtension As String = System.IO.Path.GetFileNameWithoutExtension(doc.DisplayName)
+
+                ' Define el nombre de archivo .stp
+                Dim exportFile As String = System.IO.Path.Combine(destino, nombreSinExtension & ".stp")
+
+                ' Exporta el documento a formato .STEP
+                doc.SaveAs(exportFile, True) ' El segundo argumento "True" sobrescribirá el archivo si ya existe
+
+                ' Agregar el nombre del archivo exportado a la lista
+                archivosExportados.Add(exportFile)
+
+                ' Actualiza el contador de documentos exportados
+                documentosExportados += 1
+
+                ' Actualiza la barra de estado con el progreso
+                inventorApp.StatusBarText = "Exportando documento " & documentosExportados & " de " & totalDocumentos
+            End If
+        Next
+
+        ' Mostrar una lista de los archivos exportados
+        Dim listaArchivos As String = String.Join(vbCrLf, archivosExportados.ToArray())
+        System.Windows.Forms.MessageBox.Show("Archivos exportados:" & vbCrLf & listaArchivos, "Archivos Exportados", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information)
+
+        ' Abrir la carpeta de destino
+        'System.Diagnostics.Process.Start(destino)
+
+        ' Restablecer la barra de estado
+        inventorApp.StatusBarText = ""
+    End If
+Else
+    System.Windows.Forms.MessageBox.Show("No se seleccionó ninguna carpeta de destino. La exportación se canceló.", "Exportación Cancelada", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation)
+End If
+

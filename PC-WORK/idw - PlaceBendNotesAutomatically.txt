@@ -1,0 +1,26 @@
+﻿'-----------------------------------------------------
+' Declaracion de Variables
+Dim oDoc As DrawingDocument
+Dim oSheet As Sheet
+Dim oView As DrawingView
+Dim oCurve As DrawingCurve
+Dim oBendNote As BendNote
+'-----------------------------------------------------
+
+' Inicio del Programa
+oDoc = ThisApplication.ActiveDocument
+oSheet = oDoc.ActiveSheet
+
+' Recorrido de las vistas en chapa metalica desplegada para colocar las notas 
+' automaticamente
+For Each oView In oSheet.DrawingViews
+ For Each oCurve In oView.DrawingCurves
+  If oCurve.EdgeType = Inventor.DrawingEdgeTypeEnum.kBendDownEdge _
+  Or oCurve.EdgeType = Inventor.DrawingEdgeTypeEnum.kBendUpEdge Then
+	oBendNote = oSheet.DrawingNotes.BendNotes.Add(oCurve) ' Linea especifica que crea las notas automaticamente
+  End If
+ Next 'oCurve
+Next 'oView
+
+'Notas: Añadir que sea seleccionada la vista o en su defecto que lo haga para todas.
+

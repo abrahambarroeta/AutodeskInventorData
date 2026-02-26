@@ -1,0 +1,27 @@
+﻿Dim oDoc As Document = ThisApplication.ActiveDocument
+Dim editDoc As Document
+Dim oDrawDoc As DrawingDocument = oDoc
+Dim oSheet As Sheet = oDrawDoc.ActiveSheet
+editDoc = oDrawDoc.ActiveSheet.DrawingViews(1).ReferencedDocumentDescriptor.ReferencedDocument
+Dim invDesignInfo As PropertySet
+invDesignInfo = editDoc.PropertySets.Item("Design Tracking Properties")
+Dim invPartNumberProperty As Inventor.Property
+invPartNumberProperty = invDesignInfo.Item("Part Number")
+invSummaryInfo = oDoc.PropertySets.Item("Inventor Summary Information")
+invRevNumberProperty = invSummaryInfo.Item("Revision Number")
+Dim oPropSets As PropertySets 
+oPropSets = oDoc.PropertySets 
+Dim oPropSet As PropertySet 
+oPropSet = oPropSets.Item("Design Tracking Properties")
+Dim MyDwgRev As String
+MyDwgRev = invRevNumberProperty.Value
+
+Dim oTable As RevisionTable = oSheet.RevisionTables.Item(1)
+'total number of revision rows
+Dim N As Integer = oTable.RevisionTableRows.Count
+'the last row in the table
+Dim oRow As RevisionTableRow = oTable.RevisionTableRows.Item(N)
+'MsgBox(oRow.Item(1).Text)
+iProperties.Value("Summary", "Revision Number") = oRow.Item(1).Text
+
+

@@ -1,0 +1,13 @@
+﻿'set a reference to the document 
+Dim oDoc As Document 
+oDoc = ThisApplication.ActiveDocument 
+'Set a reference to the top node of the active browser 
+Dim oTopNode As BrowserNode 
+oTopNode = oDoc.BrowserPanes.ActivePane.TopNode 
+Dim oNode As BrowserNode 
+For Each oNode In oTopNode.BrowserNodes 
+' If the node is visible and expanded, collapse it. 
+If oNode.Visible = True And oNode.Expanded = True Then 
+oNode.Expanded = False 
+End If 
+Next

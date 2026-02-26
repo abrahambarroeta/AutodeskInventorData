@@ -1,0 +1,46 @@
+﻿' Obtener el documento activo
+Dim oDoc As Document = ThisApplication.ActiveDocument
+
+' Verificar que el documento activo sea un ensamblaje o una pieza
+If oDoc.DocumentType <> DocumentTypeEnum.kAssemblyDocumentObject And oDoc.DocumentType <> DocumentTypeEnum.kPartDocumentObject Then
+    MsgBox("Este script solo funciona en ensamblajes o piezas.", vbExclamation, "iLogic")
+    Return
+End If
+
+' Solicitar al usuario que seleccione una pieza
+Dim oSelectSet As SelectSet = oDoc.SelectSet
+MsgBox("Selecciona un componente en el ensamblaje o una pieza individual para buscar su plano.", vbInformation, "iLogic")
+
+' Limpiar selección previa
+oSelectSet.Clear()
+
+' Comando para permitir la selección de una pieza o subensamblaje
+Try
+    ThisApplication.CommandManager.Pick(SelectionFilterEnum.kAssemblyOccurrenceFilter, "Selecciona un componente.")
+Catch
+    MsgBox("No se seleccionó ningún componente.", vbExclamation, "iLogic")
+    Return
+End Try
+
+' Obtener el elemento seleccionado
+If oSelectSet.Count = 0 Then
+    MsgBox("No se seleccionó ningún componente.", vbExclamation, "iLogic")
+    Return
+End If
+
+' Tomar la referencia del documento
+Dim oOcc As ComponentOccurrence = oSelectSet(1)
+Dim oRefDoc As Document = oOcc.Definition.Document
+
+' Obtener la ruta del archivo seleccionado
+Dim oFilePath As String = oRefDoc.FullFileName
+
+' Verificar si existe un archivo de dibujo asociado (.idw)
+Dim oDrawingFilePath As String = Left(oFilePath, Len(oFilePath) - 3) & "idw"
+
+If System.IO.File.Exists(oDrawingFilePath) Then
+    ' Abrir el archivo de dibujo
+    ThisApplication.Documents.Open(oDrawingFilePath, True)
+Else
+    MsgBox("No se encontró un archivo de dibujo asociado: " & oDrawingFilePath, vbExclamation, "iLogic")
+End If
