@@ -1,0 +1,40 @@
+---------------------------------------------------------
+SCRIPT PARA OBTENER LISTA DE ARCHIVOS SIN EXTENSION
+---------------------------------------------------------
+
+$carpeta = $PSScriptRoot
+$archivosPorExtension = Get-ChildItem -Path $carpeta -Recurse -File | Group-Object Extension | ForEach-Object {
+    $extension = $_.Name.TrimStart('.')
+    $archivos = $_.Group | Select-Object @{Name="Nombre"; Expression={$_.Name -replace '\.\w+$', ''}}
+    "`n$extension archivos:"
+    $archivos | ForEach-Object { "$($_.Nombre)" }
+}
+
+$archivosPorExtension | Out-File -FilePath "ListeDesFichiers.txt"
+
+
+--------------------------
+
+REVISION DE SI LOS TRES "SI" SON IGUALES
+
+--------------------------
+
+ET (EXACT (A1: D1, A1))
+
+-----------------
+PARA CAMBIAR LOS ULTIMOS 4 DIGITOS DEL ENLACE
+----------------
+
+=LIEN_HYPERTEXTE(GAUCHE([@LINK];NBCAR([@LINK])-4)&".idw")
+
+=GAUCHE([@Chemin];(NBCAR([@Chemin])-4))&".idw"
+
+
+----------------
+PARA CONVERTIR EL 'CHEMIN' EN HYPERVINCULO
+
+Añadir en otra columna esto
+
+=LIEN_HYPERTEXTE('aqui el chemin')
+
+----------------
