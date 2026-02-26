@@ -1,0 +1,19 @@
+﻿' This script change for all the view in a drawing file, the scale.
+' Modify by Abraham Barroeta
+
+
+oCurrentScale = ThisApplication.ActiveDocument.Sheets.Item(1).DrawingViews.Item(1).Scale 
+Dim ScaleForMakeConversion As Double = InputBox("Enter new scale. Remember you're introducing the variable -X- in the following relation -->  1:X", "ChangeScale for Views tool", oCurrentScale)
+Dim oScale As Double
+
+oScale = (1/ScaleForMakeConversion)
+
+
+For Each oSheet In ThisApplication.ActiveDocument.Sheets
+	oSheet.Activate
+	For Each oView In oSheet.DrawingViews	
+	   If oView.ScaleFromBase = False Then
+	       oView.Scale = oScale
+	   End If
+	Next
+Next

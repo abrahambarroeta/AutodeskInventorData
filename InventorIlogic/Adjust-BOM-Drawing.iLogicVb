@@ -1,0 +1,75 @@
+﻿Sub Main()
+	If Not ThisApplication.ActiveDocument.DocumentType = kDrawingDocumentObject Then
+		MessageBox.Show("Can only run rule on drawing documents.")
+		Exit Sub
+	End If
+	
+	Dim oDrawDoc As DrawingDocument
+	oDrawDoc = ThisApplication.ActiveDocument
+	
+	Dim oSheet As Sheet
+	oSheet = oDrawDoc.Sheets.Item(1)
+	
+'	For Each oPL As PartsList In oSheet.partslists
+		
+'	Next
+	
+	Dim oSelectSet As SelectSet
+	oSelectSet = oDrawDoc.SelectSet
+	
+	If oSelectSet.Count = 0 Then Exit Sub
+	If oSelectSet.Item(1).Type <> kPartsListObject Then Exit Sub
+		
+	Dim oPartslist As PartsList
+	oPartslist = oSelectSet.Item(1)
+	
+	PartsListFitColumns(oPartslist)
+	
+End Sub
+
+Public Function PartsListFitColumns(oPartsList As PartsList) As PartsList
+
+	If oPartsList Is Nothing Then Exit Function
+
+	' get font info
+	Dim dWidth As Double
+	dWidth = oPartsList.DataTextStyle.FontSize * oPartsList.DataTextStyle.WidthScale
+
+
+	' find longest string in each column and resize column
+	Dim oRow As PartsListRow
+	Dim sData As String
+	Dim iCol As Integer
+	Dim iCols As Integer
+
+	iCols = oPartsList.PartsListColumns.Count
+
+	' set up array to hold column widths
+	Dim iLen() As Integer
+	ReDim iLen(iCols)
+
+	' initialize to header lengths
+	For iCol = 1 To iCols
+		iLen(iCol) = Len(oPartsList.PartsListColumns(iCol).Title)
+	Next iCol
+
+	' loop thru each row
+	For Each oRow In oPartsList.PartsListRows
+		If oRow.Visible = True Then
+			For iCol = 1 To iCols
+				sData = oRow.Item(iCol).Value ' get the data from the cell
+				
+				If Len(sData) > iLen(iCol) Then
+					iLen(iCol) = Len(sData)
+				End If
+			Next iCol
+		End If
+	Next oRow
+
+	' resize the columns (note add extra 2 character width for padding)
+	For iCol = 1 To iCols
+		oPartsList.PartsListColumns(iCol).Width = dWidth * (iLen(iCol) + 2) / 1.3
+	Next iCol
+
+	Return oPartsList
+End Function

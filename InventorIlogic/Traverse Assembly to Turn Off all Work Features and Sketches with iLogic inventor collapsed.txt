@@ -1,0 +1,81 @@
+Sub Main
+
+	Dim oDoc As AssemblyDocument = ThisApplication.ActiveDocument
+	Dim oOccs As ComponentOccurrences = oDoc.ComponentDefinition.Occurrences
+
+	Dim sName As String
+	sName = oDoc.DisplayName
+
+	'set vis in the top level
+	Call SetVis(oDoc, sName)
+
+	Call TraverseAssembly(oOccs)
+
+End Sub
+
+Sub TraverseAssembly(oOccs As ComponentOccurrences)
+
+	Dim oOcc As ComponentOccurrence
+	For Each oOcc In oOccs
+
+		Dim oDoc As Document
+		oDoc = oOcc.Definition.Document
+
+		Dim sName As String
+		sName = oOcc.Name
+
+		'set vis in the component
+		Call SetVis(oOcc.Definition.Document, sName)
+
+		'if sub assembly step into it's Occurrences collection
+		If oOcc.DefinitionDocumentType = _
+				DocumentTypeEnum.kAssemblyDocumentObject Then
+			Logger.Info("Stepping into: " & sName)
+			
+			oSubOccs = oDoc.ComponentDefinition.Occurrences
+			Call TraverseAssembly(oSubOccs)
+		End If
+	Next
+
+End Sub
+
+Sub SetVis(oDoc As Document, sName As String)
+
+	Dim oDef As ComponentDefinition
+	oDef = oDoc.ComponentDefinition
+
+
+	For Each oItem In oDef.Workplanes
+		Try
+			oItem.visible = False
+		Catch
+			Logger.Info("Could not set work plane vis for: " & sName)
+		End Try
+	Next
+
+	For Each oItem In oDef.WorkAxes
+		Try
+			oItem.visible = False
+		Catch
+			Logger.Info("Could not set work axis vis for: " & sName)
+		End Try
+	Next
+
+	For Each oItem In oDef.WorkPoints
+		Try
+			oItem.visible = False
+		Catch
+			Logger.Info("Could not set work point vis for: " & sName)
+		End Try
+	Next
+
+	For Each oItem In oDef.Sketches
+		Try
+			oItem.visible = False
+		Catch
+			Logger.Info("Could not set sketch vis for: " & sName)
+		End Try
+	Next
+
+End Sub
+

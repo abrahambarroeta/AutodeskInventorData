@@ -1,0 +1,92 @@
+﻿'Title: Change View Scales [in Current Drawing Sheet]
+'Author: Abraham Barroeta
+'Description: This script change scale of a specific selected view or all the views into the current drawing. 
+
+Sub Main()
+	
+	Const transactionName As String = "Change View Scales"
+
+	Dim oSheets As Sheets
+	Dim oSheet As Sheet
+	Dim oViews As DrawingViews
+	Dim oView As DrawingView
+
+	Dim oDoc As DrawingDocument = TryCast(ThisDoc.Document, DrawingDocument)
+	If oDoc Is Nothing Then Exit Sub
+		
+	oSheet = oDoc.ActiveSheet
+
+	Dim listItems() As String = New String() {
+		"1:1",
+		"1:2", 
+		"1:5",
+		"1:10",
+		"1:20",
+		"1:50",
+		"1:100",
+		"1:200",
+		"2:1",
+		"5:1",
+		"10:1",
+		"Custom"
+		}
+
+	Dim sScale As String = InputListBox(
+	    Prompt := "Select the New scale: ",
+	    ListItems := listItems, 
+	    DefaultValue := listItems(0), 
+	    Title := "Scale All Views by Abraham Barroeta",
+	    ListName := "Scales:",
+		Width := 400,
+		Height := 400
+	)
+	
+	If sScale = "" Then Exit Sub ' Dialog was closed.  No transaction will be created.
+
+	If sScale = "Custom" Then sScale = InputBox(
+		Title :="Enter a custom view scale", 
+		Prompt :="Examples of valid scales:" & vbCrLf & 
+			"0.5" & vbCrLf & 
+			"1/2" & vbCrLf & 
+			"1:2")
+
+	Dim oTransaction As Transaction
+	
+	Try
+		oTransaction = ThisApplication.TransactionManager.StartTransaction(oDoc, transactionName)
+		
+		' See if anything is selected
+		Dim oSSet As SelectSet = oDoc.SelectSet
+		If oSSet.Count = 0 Then
+
+			'if nothing is selected, then run the SetViewName function on all views
+			oViews = oSheet.DrawingViews
+		    For Each oView In oViews
+				SetViewScale(oView, sScale)
+			Next
+		Else
+
+			'if there are selected objects, iterate through them and run the SetViewName on the view objects
+			For Each cView In oSSet.OfType(Of DrawingView)
+				SetViewScale(cView, sScale)
+			Next 'Each in oSSet
+
+		End If 'oSSet.count = 0
+		
+		oTransaction.End
+		
+	Catch ex As Exception
+		oTransaction.Abort
+		Throw
+		
+	End Try
+End Sub
+
+Function SetViewScale(ByVal xView As DrawingView, ByVal sScale As String)
+
+	Try
+		xView.ScaleString = sScale
+	Catch
+	End Try
+
+End Function
